@@ -1,0 +1,22 @@
+{
+  "name": "xinluo-spider",
+  "version": "1.0.0",
+  "description": "spider xinluo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shawsam/xinluo-spider.git"
+  },
+  "keywords": [
+    "spider"
+  ],
+  "author": "shawam",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shawsam/xinluo-spider/issues"
+  },
+  "homepage": "https://github.com/Shawsam/xinluo-spider#readme"
+}
