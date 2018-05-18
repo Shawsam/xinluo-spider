@@ -2,6 +2,7 @@ const superagent = require('superagent')
 const eventproxy = require('eventproxy')
 const async = require('async')
 const logger = require('../logger')
+const sleep = require('../sleep')
 const { productModel } = require('../model/productModel')
 const utils = require('utility')
 
@@ -30,17 +31,35 @@ function fetchSinglePage(task,callback){
 	     var filterData = []
          if(resArray){
 	         resArray.map(function(item){
-	            filterData.push({
-	              cate:cate,
-		          code:item.code,
-		          brandName:item.brandCategory.brandName,
-		          productName:item.brandCategory.displayName,
-		          salePrice:(item.userPrice.salePrice*6.35).toFixed(2),
-		          discountPrice:(item.userPrice.discountPrice*6.35).toFixed(2),
-		          discountRate:item.userPrice.discountRate,
-		          centerImg:item.galleryImages[0]['150X']?item.galleryImages[0]['150X'].url:'',
-		          updateTime:utils.YYYYMMDDHHmmss()
-	             })
+	           //  filterData.push({
+	           //    cate:cate,
+		          // code:item.code,
+		          // brandName:item.brandCategory.brandName,
+		          // productName:item.brandCategory.displayName,
+		          // salePrice:(item.userPrice.salePrice*6.35).toFixed(2),
+		          // discountPrice:(item.userPrice.discountPrice*6.35).toFixed(2),
+		          // discountRate:item.userPrice.discountRate,
+		          // centerImg:item.galleryImages[0]['150X']?item.galleryImages[0]['150X'].url:'',
+		          // updateTime:utils.YYYYMMDDHHmmss()
+	           //   })
+
+	            productModel.update(
+	                {code:item.code},
+	                {
+			          cate:cate,
+			          code:item.code,
+			          brandName:item.brandCategory.brandName,
+			          productName:item.brandCategory.displayName,
+			          salePrice:(item.userPrice.salePrice*6.35).toFixed(2),
+			          discountPrice:(item.userPrice.discountPrice*6.35).toFixed(2),
+			          discountRate:item.userPrice.discountRate,
+			          centerImg:item.galleryImages[0]['150X']?item.galleryImages[0]['150X'].url:'',
+			          updateTime:utils.YYYYMMDDHHmmss()
+			        },{upsert:true})
+	            .then(function(data){
+	                console.log('插入或更新一条数据完毕')
+	            })
+	 
 	         })    
          }
          callback(null,filterData)
@@ -51,7 +70,7 @@ function fetchSinglePage(task,callback){
 
 // ****** 定义全局变量，配置常量 ********
 const originUrl = 'http://www.shilladfs.com/estore/kr/zh/ajaxProducts'
-const cateArray = [1,2,3,4,5,6,7,8,9]
+const cateArray = [1,2,3,4,5,6,7,8,9,10,11]
 let pageTotal = 10      //将要爬取的总页数
 let fetchNum = 0        //当前并发数
 let products = []       //商品数据
@@ -71,31 +90,32 @@ const  fetchCateData = function(){
 	})
     
 	logger.info('爬取列表数据--开始')
-	async.mapLimit(taskArray,5,function(task,callback){
-	      fetchSinglePage(task,callback)
+	async.mapLimit(taskArray,1,function(task,callback){
+		let num = Math.random() * 1000 + 1000
+		sleep(num).then(()=>{ fetchSinglePage(task,callback) })
 	  },function(err,result){
 	  	  logger.info('爬取列表数据--完毕')
-	  	  result.map(function(singleItem){
-	  	  	logger.info(singleItem.length)
-	  	  	singleItem.map(function(item){
-	            productModel.update(
-	                {code:item.code},
-	                {
-			          cate:item.cate,
-			          code:item.code,
-			          brandName:item.brandName,
-			          productName:item.productName,
-			          salePrice:item.salePrice,
-			          discountPrice:item.discountPrice,
-			          discountRate:item.discountRate,
-			          centerImg:item.centerImg,
-			          updateTime:item.updateTime
-			        },{upsert:true})
-	            .then(function(data){
-	                console.log('插入或更新一条数据完毕')
-	            })
-	  	  	})
-	  	  })
+	  	  // result.map(function(singleItem){
+	  	  // 	logger.info(singleItem.length)
+	  	  // 	singleItem.map(function(item){
+	     //        productModel.update(
+	     //            {code:item.code},
+	     //            {
+			   //        cate:item.cate,
+			   //        code:item.code,
+			   //        brandName:item.brandName,
+			   //        productName:item.productName,
+			   //        salePrice:item.salePrice,
+			   //        discountPrice:item.discountPrice,
+			   //        discountRate:item.discountRate,
+			   //        centerImg:item.centerImg,
+			   //        updateTime:item.updateTime
+			   //      },{upsert:true})
+	     //        .then(function(data){
+	     //            console.log('插入或更新一条数据完毕')
+	     //        })
+	  	  // 	})
+	  	  // })
 
 	})
 }
