@@ -11,8 +11,8 @@ mongoose.Promise = promise.Promise
 mongoose.connect(DB_URL,{useMongoClient:true});
 mongoose.connection.on('connected', function () {
     console.log("数据库连接成功！");
-    fetchIndexData()
     fetchCateData()
+    fetchIndexData()
 });
 
 
